@@ -11,7 +11,10 @@ defmodule MyAppWeb.PostLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+    {:noreply,
+     socket
+     |> apply_action(socket.assigns.live_action, params)
+     |> allow_upload(:image, accept: ~w(.jpg .jpeg), max_entries: 1)}
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -38,6 +41,16 @@ defmodule MyAppWeb.PostLive.Index do
     {:ok, _} = Blog.delete_post(post)
 
     {:noreply, assign(socket, :posts, list_posts())}
+  end
+
+  def handle_event("cancel-upload", %{"ref" => ref, "value" => value}, socket) do
+    IO.inspect(
+      ref: ref,
+      value: value,
+      socket: socket
+    )
+
+    {:noreply, socket |> cancel_upload(:image, ref)}
   end
 
   defp list_posts do

@@ -43,16 +43,6 @@ defmodule MyAppWeb.PostLive.Index do
     {:noreply, assign(socket, :posts, list_posts())}
   end
 
-  def handle_event("cancel-upload", %{"ref" => ref, "value" => value}, socket) do
-    IO.inspect(
-      ref: ref,
-      value: value,
-      socket: socket
-    )
-
-    {:noreply, socket |> cancel_upload(:image, ref)}
-  end
-
   defp list_posts do
     Blog.list_posts()
   end

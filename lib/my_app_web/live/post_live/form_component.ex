@@ -10,7 +10,8 @@ defmodule MyAppWeb.PostLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, changeset)
+     |> allow_upload(:image, accept: ~w(.jpg .jpeg), max_entries: 1)}
   end
 
   @impl true
@@ -32,8 +33,17 @@ defmodule MyAppWeb.PostLive.FormComponent do
     save_post(socket, socket.assigns.action, post_params)
   end
 
-  defp save_post(socket, :edit, post_params) do
+  def handle_event("cancel-upload", %{"ref" => ref, "value" => value}, socket) do
+    IO.inspect(
+      ref: ref,
+      value: value,
+      socket: socket
+    )
 
+    {:noreply, socket |> cancel_upload(:image, ref)}
+  end
+
+  defp save_post(socket, :edit, post_params) do
     [uploaded_file] =
       consume_uploaded_entries(socket, :image, fn %{path: path}, _entry ->
         dest = Path.join([:code.priv_dir(:my_app), "static", "uploads", Path.basename(path)])
